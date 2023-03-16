@@ -1,0 +1,25 @@
+<template>
+    <template if:true={add}>
+        <lightning-card>
+            <div class="slds-backdrop slds-backdrop_open" style="background-color:#919191">
+            <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true"
+                aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+                <div class="slds-modal__container">
+                    <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse"
+                        title="Close" onclick={handleCancel}>
+                        <lightning-icon icon-name="utility:close" alternative-text="close" variant="inverse"
+                            size="small"></lightning-icon>
+                        <span class="slds-assistive-text">Close</span>
+                    </button>
+                    <div class="slds-text-heading_medium">Add New Book to Library Collection</div>
+                    <lightning-record-form object-api-name={objectApiName} fields={fields} onsuccess={handleSuccess}
+                        oncancel={handleCancel}>
+                    </lightning-record-form>
+                </div>
+            </section></div>
+        </lightning-card>
+    </template>
+    <lightning-layout-item size="4" flexibility="auto" padding="horizontal-small" class="slds-float_right">
+        <lightning-button name="Add Book" label="Add Book" onclick={handleAddBook}></lightning-button>
+    </lightning-layout-item>
+</template>

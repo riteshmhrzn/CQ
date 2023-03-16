@@ -1,0 +1,149 @@
+<template>
+  <lightning-button label="Borrower List" variant="brand" onclick={navigateToBorrowerPage}
+    class="slds-m-left_x-small"></lightning-button>
+  <lightning-card title="Books" class="book-libary">
+    <div class="slds-card__body slds-card__body_inner">
+      <!-- Start book list -->
+      <div class="slds-grid slds-gutters">
+        <div class="slds-col slds-size_2-of-3">
+
+          <!-- Code for book search by book name-->
+          <template if:true={visiblebooks}>
+            <div class="slds-size_1-of-2">
+              <lightning-input type="search" onchange={handleSearchTermChange} variant="label-hidden"
+                class="slds-var-m-bottom_small" placeholder="Search for Books" value={searchTerm}>
+              </lightning-input>
+            </div>
+            <lightning-layout multiple-rows="true" pull-to-boundary="small">
+              <template for:each={visiblebooks} for:item="book">
+                <lightning-layout-item key={book.Id} size="5" class="slds-var-p-around_x-small">
+                  <!-- stating book tile-->
+                  <lightning-card title={book.Name} class="books-tile" value={book.Name}
+                    onchange={handlebooknamechange}>
+                    <div class="slds-var-p-horizontal_small bear-tile-body">
+                      <div class="slds-media">
+                        <div class="slds-media__figure">
+                          <img src={book.Image_URL__c} alt="book profile" class="book" width="100" height="100" />
+                        </div>
+                        <div class="slds-media__body">
+                          <p class="slds-var-m-bottom_xx-small">Book Id:{book.Book_Id__c}</p>
+                          <p class="slds-var-m-bottom_xx-small">Book Name:{book.Name}</p>
+                          <p class="slds-var-m-bottom_xx-small">Author:{book.Author__c}</p>
+                          
+                          <!-- Code to view book description on button click-->
+                          <lightning-button label="Description" value={book.Id} onclick={viewbook}
+                            class="slds-m-left_x-small"></lightning-button>
+                          <lightning-button label="Borrow Book" title="Pop Up Form" onclick={customShowModalPopup}
+                            value={book.Id} class="slds-m-left_x-small"></lightning-button>
+
+                          <!--popup modal start -->
+                          <template if:true={customFormModal}>
+                            <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true"
+                              aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+                              <div class="slds-modal__container">
+                                <!-- modal header start -->
+                                <header class="slds-modal__header">
+                                  <button
+                                    class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse"
+                                    title="Close" onclick={customHideModalPopup}>
+                                    <lightning-icon icon-name="utility:close" alternative-text="close" variant="inverse"
+                                      size="small"></lightning-icon>
+                                    <span class="slds-assistive-text">Close</span>
+                                  </button>
+                                  <h2 class="slds-text-heading_medium slds-hyphenate">Book Borrow Form</h2>
+                                </header>
+                                <!-- modal body start -->
+                                <div class="slds-modal__content slds-p-around_medium">
+                                  <div class="slds-grid slds-wrap">
+                                    <div
+                                      class="slds-col slds-size_6-of-12 slds-p-horizontal--medium slds-m-bottom_medium">
+                                      <lightning-input label="Book Name" name="bookname" value={book.Name}
+                                        readonly="true" onchange={handleNameChange}></lightning-input>
+                                    </div>
+                                    <div
+                                      class="slds-col slds-size_6-of-12 slds-p-horizontal--medium slds-m-bottom_medium">
+                                      <lightning-input label="Date Of Issue" type="date" name="myDate"
+                                        value={dateofissue} onchange={handleDOIChange}>
+                                      </lightning-input>
+                                    </div>
+                                    <div
+                                      class="slds-col slds-size_6-of-12 slds-p-horizontal--medium slds-m-bottom_medium">
+                                      <lightning-input label="Status" name="status" value={status} readonly="true">
+                                      </lightning-input>
+                                    </div>
+                                  </div>
+                                  <!-- modal footer start-->
+                                  <footer class="slds-modal__footer">
+                                    <div class="slds-align_absolute-center" style="height:1rem">
+                                      <button class="slds-button slds-button--destructive"
+                                        onclick={customHideModalPopup}>Cancel</button>
+                                      <button class="slds-button slds-button_brand"
+                                        onclick={handleClick}>Borrow</button>
+                                    </div>
+                                  </footer>
+                                </div>
+                              </div>
+                            </section>
+                            <div class="slds-backdrop slds-backdrop_open">
+                            </div>
+                          </template>
+                          <!-- modal end -->
+                        </div>
+                      </div>
+                    </div>
+                  </lightning-card>
+                </lightning-layout-item>
+              </template>
+            </lightning-layout>
+          </template>
+          <div slot="footer" class="slds-var-m-vertical_medium">
+            <c-pagination records={totalbooks} onupdate={updatebookHandler} record-size="1"></c-pagination>
+          </div>
+
+          <!-- Data failed to load -->
+          <template if:false={visiblebooks}>
+            <div class="slds-align_absolute-center slds-var-m-vertical_small">
+              An error occurred while loading book list
+            </div>
+          </template>
+        </div>
+        <!-- section to display record details -->
+        <div class="slds-col slds-size_1-of-3">
+          <div class="slds-border_left">
+            <lightning-card title="Book Description" class="book-libary">
+              <template if:true={view}>
+                <template if:true={allBooks.data}>
+                  <template for:each={allBooks.data} for:item="book">
+                    <lightning-layout-item key={book.Id} size="5" class="slds-var-p-around_x-small">
+                      <lightning-card title={book.Name} class="books-tile">
+                        <div class="slds-var-p-horizontal_small book-tile-body">
+                          <div class="slds-media">
+                            <div class="slds-media__figure">
+                              <p><img src={book.Image_URL__c} alt="book profile" class="book" width="150"
+                                  height="150" /></p>
+
+                              <p><b>BY: {book.Author__c} (Author)</b></p>
+                            </div>
+                            <div class="slds-media__body">
+                              <p class="slds-var-m-bottom_xx-small">{book.Description__c}</p>
+                            </div>
+                          </div>
+                        </div>
+                      </lightning-card>
+                    </lightning-layout-item>
+                  </template>
+                </template>
+              </template>
+              <template if:false={view}>
+                <h2> Please select a book</h2>
+              </template>
+            </lightning-card>
+          </div>
+        </div>
+      </div>
+
+
+
+    </div>
+  </lightning-card>
+</template>
